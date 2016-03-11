@@ -10,6 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +25,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private Button button;
@@ -107,7 +113,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if ((line = reader.readLine()) != null) {
                             builder.append(line);
                         }
-                        parseJsonWithJsonObject(builder.toString());
+//                        parseJsonWithJsonObject(builder.toString());
+                          parseJsonWithGSON(builder.toString());
                         Message message = handler.obtainMessage();
                         message.what = GETMESSAGE;
                         message.obj = builder.toString();
@@ -126,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }).start();
     }
+
+
     /**
      * Json数据串如下：
      * [{"id":"0","name":"aaaaa","version":"1"},{"id":"1","name":"bbbbb","version":"2"},{"id":"2","name":"ccccc","version":"3"},]
@@ -169,18 +178,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      }
 上面这个json串以{}开始，因此最外层是对象，然后里面是数组，然后是对象。programmers是数组名。
      */
-    private void parseJsonWithJsonObject(String s)  {
-        try {
-            JSONArray jsonArray=new JSONArray(s);
-            // 首先JSON数据最外层是一个数组，这个是根据返回的数据进行判断的，里面的是一个一个的对象，因此需要先取出数组中的所有数据。
-            for(int i=0;i<jsonArray.length();i++){//然后进行循环取出数组中的这三个对象。
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-                String id=jsonObject.getString("id");
-                String name=jsonObject.getString("name");
-                String version=jsonObject.getString("version");
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//    private void parseJsonWithJsonObject(String s)  {
+//        try {
+//            JSONArray jsonArray=new JSONArray(s);
+//            // 首先JSON数据最外层是一个数组，这个是根据返回的数据进行判断的，里面的是一个一个的对象，因此需要先取出数组中的所有数据。
+//            for(int i=0;i<jsonArray.length();i++){//然后进行循环取出数组中的这三个对象。
+//                JSONObject jsonObject=jsonArray.getJSONObject(i);
+//                String id=jsonObject.getString("id");
+//                String name=jsonObject.getString("name");
+//                String version=jsonObject.getString("version");
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
+    private void parseJsonWithGSON(String s) {//使用GSON解析，需要先引入GSON的包
+      Gson gson=new Gson();
+        List<Person> list=gson.fromJson(s,new TypeToken<List<Person>>(){}.getType());//通过TypeToken将我们期望解析成的数据传入到fromJson中
+
     }
 }
